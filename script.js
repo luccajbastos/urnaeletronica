@@ -10,6 +10,7 @@ let numeros = qs('.d-1-3');
 let etapaAtual = 0;
 let numero = '';
 let votoBranco = true;
+let votos = [];
 
 function comecarEtapa() {
     let etapa = etapas[etapaAtual];
@@ -49,7 +50,11 @@ function atualizaInterface(){
         
         let fotosHtml = '';
         for(let i in candidato.fotos){
-            fotosHtml += `<div class="d-1-image"><img src="imagens/${candidato.fotos[i].url}" alt=""/>${candidato.fotos[i].legenda}</div>`;
+            if(candidato.fotos[i].small){
+                fotosHtml += `<div class="d-1-image small"><img src="imagens/${candidato.fotos[i].url}" alt=""/>${candidato.fotos[i].legenda}</div>`;
+            } else {
+                fotosHtml += `<div class="d-1-image"><img src="imagens/${candidato.fotos[i].url}" alt=""/>${candidato.fotos[i].legenda}</div>`;
+            }
         }
         lateral.innerHTML = fotosHtml;
     }else{
@@ -87,10 +92,33 @@ function corrige(){
 }
 function confirma(){
     let etapa = etapas[etapaAtual];
+
+    let votoConfirmado = false;
     if(votoBranco ===  true){
+        votoConfirmado = true;
+        votos.push({
+            etapa: etapas[etapaAtual].titulo,
+            voto: 'branco'
+        })
         alert("URNA: confirmado como BRANCO.")
     } else if (numero.length === etapa.numeros){
+        votos.push({
+            etapa: etapas[etapaAtual].titulo,
+            voto: numero
+        })
+        votoConfirmado = true;
         alert("URNA: confirmado como "+numero);
+    }
+
+    if(votoConfirmado){
+        etapaAtual++;
+        if(etapas[etapaAtual] !== undefined) {
+            comecarEtapa();
+        } else {
+            console.log("URNA: Votos computados. Obrigado!");
+            qs('.tela').innerHTML = '<div class="aviso--gigante pisca">FIM</div>'
+            console.log(votos)
+        }
     }
 }
 
